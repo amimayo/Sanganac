@@ -8,10 +8,10 @@ module PC (
 
     reg [31:0] pc;
 
-    always @(posedge clk) begin
+    always @(posedge clk or posedge reset) begin
         
         if (reset) begin
-            pc <= 0;
+            pc <= 32'b0;
         end
         else if (is_jump) begin
             pc <= jump_pc;

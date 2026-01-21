@@ -6,7 +6,7 @@ module DECODER (
     output [6:0] opcode,
     output [2:0] funct3,
     output [6:0] funct7,
-    output [31:0] imm_ext
+    output reg [31:0] imm_ext
 );
 
     assign opcode = instr[6:0];

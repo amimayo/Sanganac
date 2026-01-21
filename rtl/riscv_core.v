@@ -8,7 +8,7 @@ module RISCV_CORE (
     wire [31:0] rs1, rs2, rd;
     wire [63:0] alu_output;
     wire [31:0] alu_in1, alu_in2;
-    wire [31:0] mem_addr, mem_read_data, mem_wr_data;
+    wire [31:0] mem_addr, mem_read_data, mem_data_wr;
     wire [6:0] opcode, funct7;
     wire [2:0] funct3;
     wire [7:0] aluop;
@@ -42,7 +42,7 @@ module RISCV_CORE (
     DATAMEM datamem (
         .clk(clk),
         .addr(mem_addr),
-        .mem_wr_data(mem_wr_data),
+        .mem_data_wr(mem_data_wr),
         .wr_en_mem(wr_en_mem),
         .mem_mask(mem_mask),
         .mem_read_data(mem_read_data)
@@ -60,7 +60,7 @@ module RISCV_CORE (
     );
 
     ALU alu (
-        .alucode(alucode),
+        .alucode(aluop),
         .rs1(alu_in1),
         .rs2(alu_in2),
         .rd(alu_output)

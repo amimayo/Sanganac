@@ -5,8 +5,8 @@ module REGFILE (
     input [4:0] rs2_addr,
     input [4:0] rd_addr,
     input [31:0] rd,
-    output [31:0] rs1,
-    output [31:0] rs2
+    output reg [31:0] rs1,
+    output reg [31:0] rs2
 );
 
 
@@ -57,7 +57,7 @@ module REGFILE (
     always @(posedge clk) begin
         regfile[0] <= 0;
 
-        if (wr_en) begin
+        if (wr_en && rd_addr != 5'd0) begin
             regfile[rd_addr] <= rd;
         end
     end
