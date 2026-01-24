@@ -18,6 +18,7 @@ module CONTROL_UNIT (
     output reg [7:0] aluop,
     output reg wr_en_rf,
     output reg wr_en_mem,
+    output reg read_en_mem,
     output reg [31:0] mem_data_wr,
     output reg [31:0] mem_addr,
     output reg [3:0] mem_mask,
@@ -32,10 +33,11 @@ module CONTROL_UNIT (
         
         alu_in1     = rs1_in;
         alu_in2     = rs2_in;
-        out         = rd_output; 
+        out         = 32'b0; 
         aluop       = 8'd0;
         wr_en_rf    = 0;
         wr_en_mem   = 0;
+        read_en_mem = 0;
         mem_data_wr = rs2_in;
         mem_addr    = rd_output[31:0];
         mem_mask    = 4'b0000;
@@ -53,29 +55,29 @@ module CONTROL_UNIT (
                 3'b000 : begin //MUL
                     alu_in1 = rs1_in;
                     alu_in2 = rs2_in;
-                    out = rd_output[31:0];
                     aluop = 8'd3;
+                    out = rd_output[31:0];
                 end
  
                 3'b001 : begin //MULH
                     alu_in1 = rs1_in;
                     alu_in2 = rs2_in;
-                    out = rd_output[63:32];
                     aluop = 8'd3;
+                    out = rd_output[63:32];
                 end
 
                 3'b101 : begin //DIV
                     alu_in1 = rs1_in;
                     alu_in2 = rs2_in;
-                    out = rd_output;
                     aluop = 8'd4;
+                    out = rd_output;
                 end
 
                 3'b111 : begin //REM
                     alu_in1 = rs1_in;
                     alu_in2 = rs2_in;
-                    out = rd_output;
                     aluop = 8'd5;
+                    out = rd_output;
                 end
 
                 endcase
@@ -87,43 +89,43 @@ module CONTROL_UNIT (
                 3'b000 : begin //ADD/SUB
                     alu_in1 = rs1_in;
                     alu_in2 = (opcode == 7'b0010011) ? imm_ext : rs2_in; //IMM FOR I-TYPE : RS2 FOR R-TYPE
-                    out = rd_output;
                     aluop = ((opcode == 7'b0110011) && funct7[5]) ? 8'd2 : 8'd1; //SUB:ADD
+                    out = rd_output;
                 end
 
                 3'b001 : begin //SLL
                     alu_in1 = rs1_in;
                     alu_in2 = (opcode == 7'b0010011) ? imm_ext : rs2_in;
-                    out = rd_output;
                     aluop = 8'd9;
+                    out = rd_output;
                 end
 
                 3'b100 : begin //XOR
                     alu_in1 = rs1_in;
                     alu_in2 = rs2_in;
-                    out = rd_output;
                     aluop = 8'd8;
+                    out = rd_output;
                 end
 
                 3'b101 : begin //SRL/SRA
                     alu_in1 = rs1_in;
                     alu_in2 = (opcode == 7'b0010011) ? imm_ext : rs2_in;
-                    out = rd_output;
                     aluop = (funct7[5]) ? 8'd11 : 8'd10; //SRA:SRL
+                    out = rd_output;
                 end
 
                 3'b110 : begin //OR
                     alu_in1 = rs1_in;
                     alu_in2 = (opcode == 7'b0010011) ? imm_ext : rs2_in;
-                    out = rd_output;
                     aluop = 8'd7;
+                    out = rd_output;
                 end
 
                 3'b111 : begin //AND
                     alu_in1 = rs1_in;
                     alu_in2 = (opcode == 7'b0010011) ? imm_ext : rs2_in;
-                    out = rd_output;
                     aluop = 8'd6;
+                    out = rd_output;
                 end
 
                 endcase
@@ -198,6 +200,7 @@ module CONTROL_UNIT (
 
         7'b0000011 : begin //LOAD
             wr_en_rf = 1;
+            read_en_mem = 1;
             alu_in1 = rs1_in;
             alu_in2 = imm_ext;
             aluop = 8'd1;
@@ -206,7 +209,7 @@ module CONTROL_UNIT (
             out = mem_read;
         end
 
-        default begin
+        default : begin
             wr_en_rf = 0;
             wr_en_mem = 0;
             is_jump =  0;

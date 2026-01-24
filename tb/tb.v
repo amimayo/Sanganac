@@ -27,12 +27,22 @@ module tb ();
         
         #500;
 
-        // 00A00093 ADDI x1, x0, 10
-        // 01400113 ADDI x2, x0, 20
-        // 002081B3 ADD x3, x1, x2
-        // 00302023 SW x3, 0(x0)
-        // 00002203 LW x4, 0(x0)
-        // 0000006F JAL x0, 0 (Infinite Loop)
+        // ABCDE537  00: LUI X10, 0XABCDE      X10 = 0XABCDE000
+        // 00A00093   04: ADDI X1, X0, 10       X1 = 10
+        // 00300113   08: ADDI X2, X0, 3        X2 = 3
+        // 002081B3   0C: ADD X3, X1, X2        X3 = 13
+        // 40208233   10: SUB X4, X1, X2        X4 = 7
+        // 022082B3   14: MUL X5, X1, X2        X5 = 30
+        // 0220D333   18: DIV X6, X1, X2        X6 = 3
+        // 0220F3B3   1C: REM X7, X1, X2        X7 = 1
+        // 0023D433   20: SRL X8, X7, X2        X8 = 1 >> 3 = 0
+        // 00552023   24: SW  X5, 0X10          STORE X5 (30) AT DATA MEMORY ADDRESS 0
+        // 00052483   28: LW  X9, 0X10          LOAD FROM DATA MEMORY ADDRESS 0 INTO X9
+        // 00928663   2C: BEQ X5, X9, 12        IF 30 == 30, JUMP +12 BYTES TO PC 38
+        // 00100513   30: ADDI X10, X0, 1       TRAP: SHOULD BE SKIPPED
+        // 00100513   34: ADDI X10, X0, 1       TRAP: SHOULD BE SKIPPED
+        // 01E00613  38: ADDI X12, X0, 30      SUCCESS: X12 = 30
+        // 0000006F   3C: JAL X0, 0             INFINITE LOOP
 
         $display("Simulation now completed.");
 

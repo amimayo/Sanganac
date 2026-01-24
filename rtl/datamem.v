@@ -3,6 +3,7 @@ module DATAMEM (
     input [31:0] addr,
     input [31:0] mem_data_wr,
     input wr_en_mem,
+    input read_en_mem,
     input [3:0] mem_mask,
     output reg [31:0] mem_read_data
 );
@@ -16,10 +17,7 @@ module DATAMEM (
 
     always @(*) begin
 
-        if(wr_en_mem) begin
-            mem_read_data <= 32'b0;
-        end
-        else begin
+        if(read_en_mem) begin
 
             case(mem_mask)
 
@@ -33,6 +31,10 @@ module DATAMEM (
             default : mem_read_data = datamem[word_addr];
 
             endcase
+
+        end
+        else begin 
+            mem_read_data = 32'b0;
         end
     end
 

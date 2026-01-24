@@ -13,7 +13,7 @@ module RISCV_CORE (
     wire [2:0] funct3;
     wire [7:0] aluop;
     wire [3:0] mem_mask;
-    wire wr_en_rf, wr_en_mem, is_jump;
+    wire wr_en_rf, wr_en_mem, read_en_mem, is_jump;
 
     PC pc (
         .clk(clk),
@@ -44,6 +44,7 @@ module RISCV_CORE (
         .addr(mem_addr),
         .mem_data_wr(mem_data_wr),
         .wr_en_mem(wr_en_mem),
+        .read_en_mem(read_en_mem),
         .mem_mask(mem_mask),
         .mem_read_data(mem_read_data)
 );  
@@ -86,6 +87,7 @@ module RISCV_CORE (
         .aluop(aluop),
         .wr_en_rf(wr_en_rf),
         .wr_en_mem(wr_en_mem),
+        .read_en_mem(read_en_mem),
         .mem_data_wr(mem_data_wr),
         .mem_addr(mem_addr),
         .mem_mask(mem_mask),

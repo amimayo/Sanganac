@@ -5,8 +5,8 @@ module REGFILE (
     input [4:0] rs2_addr,
     input [4:0] rd_addr,
     input [31:0] rd,
-    output reg [31:0] rs1,
-    output reg [31:0] rs2
+    output wire [31:0] rs1,
+    output wire [31:0] rs2
 );
 
 
