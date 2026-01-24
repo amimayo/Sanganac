@@ -136,7 +136,7 @@ module CONTROL_UNIT (
             wr_en_rf = 1;
 
             aluop = 0;
-            out = (opcode == 7'b0110111) ? imm_ext : pc + imm_ext;
+            out = (opcode == 7'b0110111) ? imm_ext : pc + imm_ext; //LUI/AUIPC
         end
 
         7'b1100011 : begin //B-TYPE
@@ -205,8 +205,26 @@ module CONTROL_UNIT (
             alu_in2 = imm_ext;
             aluop = 8'd1;
             mem_addr = rd_output[31:0];
-            mem_mask = 4'b1111;
             out = mem_read;
+
+            case(funct3)
+
+            3'b000 : begin //LB
+                case(byte_sel)
+
+                2'b00 : mem_mask = 4'b0001;
+                2'b01 : mem_mask = 4'b0010;
+                2'b10 : mem_mask = 4'b0100;
+                2'b11 : mem_mask = 4'b1000;
+
+                endcase
+            end 
+
+            3'b001 : mem_mask = (byte_sel[1]) ? 4'b1100 : 4'b0011; //LH
+
+            3'b010 : mem_mask = 4'b1111; ///LW
+
+            endcase
         end
 
         default : begin

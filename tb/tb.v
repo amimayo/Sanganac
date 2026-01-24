@@ -27,7 +27,7 @@ module tb ();
         
         #500;
 
-        // ABCDE537  00: LUI X10, 0XABCDE      X10 = 0XABCDE000
+        // ABCDE537   00: LUI X10, 0XABCDE      X10 = 0XABCDE000
         // 00A00093   04: ADDI X1, X0, 10       X1 = 10
         // 00300113   08: ADDI X2, X0, 3        X2 = 3
         // 002081B3   0C: ADD X3, X1, X2        X3 = 13
@@ -41,7 +41,7 @@ module tb ();
         // 00928663   2C: BEQ X5, X9, 12        IF 30 == 30, JUMP +12 BYTES TO PC 38
         // 00100513   30: ADDI X10, X0, 1       TRAP: SHOULD BE SKIPPED
         // 00100513   34: ADDI X10, X0, 1       TRAP: SHOULD BE SKIPPED
-        // 01E00613  38: ADDI X12, X0, 30      SUCCESS: X12 = 30
+        // 01E00613   38: ADDI X12, X0, 30      SUCCESS: X12 = 30
         // 0000006F   3C: JAL X0, 0             INFINITE LOOP
 
         $display("Simulation now completed.");

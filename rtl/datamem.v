@@ -10,9 +10,13 @@ module DATAMEM (
 
     reg [31:0] datamem [0:2047];
     wire [10:0] word_addr = addr[12:2];
+    integer i;
 
     initial begin
-    $readmemh("./sim/data_mem.hex", datamem);
+        for (i = 0; i < 2048; i = i + 1) begin
+            datamem[i] = 32'h0;
+        end 
+        $readmemh("./sim/data_mem.hex", datamem);
     end
 
     always @(*) begin

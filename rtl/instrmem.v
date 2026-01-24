@@ -4,9 +4,13 @@ module INSTRMEM (
 );
 
     reg [31:0] instrmem [0:511];
+    integer i;
 
     initial begin
-    $readmemh("./sim/instr_program.hex", instrmem);
+        for (i = 0; i < 2048; i = i + 1) begin
+            instrmem[i] = 32'h0;
+        end 
+        $readmemh("./sim/instr_program.hex", instrmem);
     end
 
     assign instr = instrmem[instr_addr >> 2];
