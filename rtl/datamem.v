@@ -21,7 +21,7 @@ module DATAMEM (
 
     always @(*) begin
 
-        if(read_en_mem) begin
+        if(read_en_mem) begin //Data Memory Read
 
             case(mem_mask)
 
@@ -44,7 +44,7 @@ module DATAMEM (
 
     always @(posedge clk) begin
         
-        if(wr_en_mem) begin
+        if(wr_en_mem) begin //Data Memory Write
 
             if(mem_mask[0]) datamem[word_addr][7:0] <= mem_data_wr[7:0];
             if(mem_mask[1]) datamem[word_addr][15:8] <= mem_data_wr[15:8];

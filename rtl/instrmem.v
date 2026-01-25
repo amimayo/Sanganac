@@ -13,6 +13,6 @@ module INSTRMEM (
         $readmemh("./sim/instr_program.hex", instrmem);
     end
 
-    assign instr = instrmem[instr_addr >> 2];
+    assign instr = instrmem[instr_addr >> 2]; //Instruction Memory Read
         
 endmodule

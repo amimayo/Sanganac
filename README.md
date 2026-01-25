@@ -15,7 +15,7 @@
 ```
 
 ├── assets/                 
-│   ├── cycle.png           # Execution cycle state diagram
+│   ├── cycle.png           # Execution cycle diagram
 │   ├── sanganac.png        # Project logo
 │   └── waveform.png        # GTKWave simulation waveform
 ├── rtl/                   
@@ -203,6 +203,7 @@ This is the waveform generated along with the above-mentioned and other included
 The verification testbench `tb.v` executes a sequence of instructions designed to ensure proper execution of each feature. :
 
 ```
+
     ABCDE537   00: LUI X10, 0XABCDE      X10 = 0XABCDE000
     00A00093   04: ADDI X1, X0, 10       X1 = 10
     00300113   08: ADDI X2, X0, 3        X2 = 3
@@ -220,7 +221,6 @@ The verification testbench `tb.v` executes a sequence of instructions designed t
     01E00613   38: ADDI X12, X0, 30      SUCCESS: X12 = 30
     0000006F   3C: JAL X0, 0             INFINITE LOOP
     
-
 ```
 
 1. **RV32I Execution** : Performing basic operations such as ADD to verify datapath.

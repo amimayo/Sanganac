@@ -49,8 +49,8 @@ module REGFILE (
 
     end
 
-        assign rs1 = regfile[rs1_addr];
-        assign rs2 = regfile[rs2_addr];   
+    assign rs1 = regfile[rs1_addr];
+    assign rs2 = regfile[rs2_addr];   
 
     always @(posedge clk) begin
         regfile[0] <= 0;
@@ -59,6 +59,5 @@ module REGFILE (
             regfile[rd_addr] <= rd;
         end
     end
-
 
 endmodule
