@@ -4,6 +4,7 @@ module DATAMEM (
     input [31:0] mem_data_wr,
     input wr_en_mem,
     input read_en_mem,
+    input load_unsigned,
     input [3:0] mem_mask,
     output reg [31:0] mem_read_data
 );
@@ -25,12 +26,12 @@ module DATAMEM (
 
             case(mem_mask)
 
-            4'b0001 : mem_read_data = {{24{datamem[word_addr][7]}}, datamem[word_addr][7:0] };
-            4'b0010 : mem_read_data = {{24{datamem[word_addr][15]}}, datamem[word_addr][15:8] };
-            4'b0100 : mem_read_data = {{24{datamem[word_addr][23]}}, datamem[word_addr][23:16] };
-            4'b1000 : mem_read_data = {{24{datamem[word_addr][31]}}, datamem[word_addr][31:24] };
-            4'b0011 : mem_read_data = {{16{datamem[word_addr][15]}}, datamem[word_addr][15:0] };
-            4'b1100 : mem_read_data = {{16{datamem[word_addr][31]}}, datamem[word_addr][31:16] };
+            4'b0001 : mem_read_data = (load_unsigned) ? {24'b0, datamem[word_addr][7:0]} : {{24{datamem[word_addr][7]}}, datamem[word_addr][7:0] };
+            4'b0010 : mem_read_data = (load_unsigned) ? {24'b0, datamem[word_addr][15:8]} : {{24{datamem[word_addr][15]}}, datamem[word_addr][15:8] };
+            4'b0100 : mem_read_data = (load_unsigned) ? {24'b0, datamem[word_addr][23:16]} : {{24{datamem[word_addr][23]}}, datamem[word_addr][23:16] };
+            4'b1000 : mem_read_data = (load_unsigned) ? {24'b0, datamem[word_addr][31:24]} : {{24{datamem[word_addr][31]}}, datamem[word_addr][31:24] };
+            4'b0011 : mem_read_data = (load_unsigned) ? {16'b0, datamem[word_addr][15:0]} : {{16{datamem[word_addr][15]}}, datamem[word_addr][15:0] };
+            4'b1100 : mem_read_data = (load_unsigned) ? {16'b0, datamem[word_addr][31:16]} : {{16{datamem[word_addr][31]}}, datamem[word_addr][31:16] };
             4'b1111 : mem_read_data = datamem[word_addr];
             default : mem_read_data = datamem[word_addr];
 

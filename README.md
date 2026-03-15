@@ -14,13 +14,14 @@
 
 ```
 
-├── assets/                 
+├── assets/                  
 │   ├── cycle.png           # Execution cycle diagram
 │   ├── sanganac.png        # Project logo
 │   └── waveform.png        # GTKWave simulation waveform
 ├── rtl/                   
 │   ├── alu.v               # Arithmetic Logic Unit
 │   ├── control.v           # Control unit
+│   ├── csr.v               # Control and Status Registers
 │   ├── datamem.v           # Data Memory
 │   ├── decoder.v           # Instruction Decoder & Immediate generation
 │   ├── instrmem.v          # Instruction Memory
@@ -37,6 +38,7 @@
 │   └── tb.v                # Comprehensive System Testbench
 ├── LICENSE                 # License (MIT)
 └── README.md               # Project documentation
+
 
 ```
 
@@ -59,45 +61,53 @@ Sanganac provides a RISCV based instruction set, implementing the RV32I specific
 
 #### **Integer (I) Extension** 
 
-The core handles base integer operations across all standard RISC-V instruction formats implemented in your `decoder.v` and `control.v`:
+The core handles base integer operations across all standard RISC-V instruction formats implemented in `decoder.v` and `control.v`:
 
-* **R-Type (Register-to-Register):**
-* `ADD`, `SUB`: Addition and Subtraction logic.
-* `SLL`, `SRL`, `SRA`: Logical Left/Right and Arithmetic Right Shifts.
-* `XOR`, `OR`, `AND`: Bitwise logical operations.
+* R-Type (Register-to-Register):
+    * ADD, SUB: Addition and Subtraction logic.
+    * SLL, SRL, SRA: Logical Left/Right and Arithmetic Right Shifts.
+    * XOR, OR, AND: Bitwise logical operations.
+    * SLT, SLTU: Set Less Than (Signed/Unsigned).
 
+* I-Type (Immediate & Loads):
+    * ADDI, ANDI, ORI, XORI: Arithmetic and logical operations using 12-bit sign-extended constants.
+    * SLLI, SRLI, SRAI: Shift operations using immediate values.
+    * SLTI, SLTUI: Set Less Than Immediate (Signed/Unsigned).
+    * LB, LH, LW: Load Byte, Half-word, and Word.
+    * LBU, LHU: Load Byte and Half-word (Unsigned).
 
-* **I-Type (Immediate & Loads):**
-* `ADDI`, `ANDI`, `ORI`, `XORI`: Arithmetic and logical operations using 12-bit sign-extended constants.
-* `SLLI`, `SRLI`, `SRAI`: Shift operations using immediate values.
-* `LB`, `LH`, `LW`: Load Byte, Half-word, and Word.
+* S-Type (Stores):
+    * SB, SH, SW: Store Byte, Half-word, and Word.
 
+* B-Type (Conditional Branches):
+    * BEQ, BNE: Branch if Equal or Not Equal.
+    * BLT, BGE: Branch if Less Than or Greater than/Equal (Signed).
+    * BLTU, BGEU: Branch if Less Than or Greater than/Equal (Unsigned).
+    * These calculate the jump_pc and trigger the is_jump signal to update the Program Counter.
 
-* **S-Type (Stores):**
-* `SB`, `SH`, `SW`: Store Byte, Half-word, and Word.
+* U-Type (Upper Immediates):
+    * LUI: Load Upper Immediate.
+    * AUIPC: Add Upper Immediate to PC.
 
+* J-Type (Unconditional Jumps):
+    * JAL: Jump and Link (Relative jump).
+    * JALR: Jump and Link Register (Absolute jump via register + immediate).
 
-* **B-Type (Conditional Branches):**
-* `BEQ`, `BNE`: Branch if Equal or Not Equal. These calculate the `jump_pc` and trigger the `is_jump` signal to update the Program Counter.
+* Multiplication (M-Extension):
+    * MUL: Returns the lower 32 bits of the product.
+    * MULH, MULHU, MULHSU: Returns the upper 32 bits of the product (Signed, Unsigned, or Mixed Signed/Unsigned).
 
+* Division & Remainder (M-Extension):
+    * DIV, DIVU: Signed and Unsigned integer division.
+    * REM, REMU: Signed and Unsigned remainder (modulo) operation.
 
-* **U-Type (Upper Immediates):**
-* `LUI`: Load Upper Immediate (sets the top 20 bits of a register).
-* `AUIPC`: Add Upper Immediate to PC (used for position-independent addressing).
+* System & CSR Instructions:
+    * CSRRW, CSRRS, CSRRC: Atomic Read/Write, Read/Set, and Read/Clear CSR registers using registers.
+    * CSRRWI, CSRRSI, CSRRCI: Atomic CSR operations using a 5-bit immediate (Zicsr).
+    * ECALL: Environment Call to trigger a system trap.
+    * EBREAK: Debugger breakpoint trap.
+    * MRET: Machine-mode Return from trap; restores mstatus and jumps to mepc.
 
-
-* **J-Type (Unconditional Jumps):**
-* `JAL`: Jump and Link. Performs an unconditional relative jump and stores the return address in the destination register.
-
-
-* **Multiplication:**
-* `MUL`: Returns the lower 32 bits of the product.
-* `MULH`: Returns the upper 32 bits of a signed multiplication, utilizing the ALU's internal 64-bit output bus.
-
-
-* **Division & Remainder:**
-* `DIV`: Signed integer division.
-* `REM`: Signed remainder (modulo) operation.
 
 ---
 
@@ -204,38 +214,54 @@ The verification testbench `tb.v` executes a sequence of instructions designed t
 
 ```
 
-    ABCDE537   00: LUI X10, 0XABCDE      X10 = 0XABCDE000
-    00A00093   04: ADDI X1, X0, 10       X1 = 10
-    00300113   08: ADDI X2, X0, 3        X2 = 3
-    002081B3   0C: ADD X3, X1, X2        X3 = 13
-    40208233   10: SUB X4, X1, X2        X4 = 7
-    022082B3   14: MUL X5, X1, X2        X5 = 30
-    0220D333   18: DIV X6, X1, X2        X6 = 3
-    0220F3B3   1C: REM X7, X1, X2        X7 = 1
-    0023D433   20: SRL X8, X7, X2        X8 = 1 >> 3 = 0
-    00552023   24: SW  X5, 0X10          STORE X5 (30) AT DATA MEMORY ADDRESS 0
-    00052483   28: LW  X9, 0X10          LOAD FROM DATA MEMORY ADDRESS 0 INTO X9
-    00928663   2C: BEQ X5, X9, 12        IF 30 == 30, JUMP +12 BYTES TO PC 38
-    00100513   30: ADDI X10, X0, 1       TRAP: SHOULD BE SKIPPED
-    00100513   34: ADDI X10, X0, 1       TRAP: SHOULD BE SKIPPED
-    01E00613   38: ADDI X12, X0, 30      SUCCESS: X12 = 30
-    0000006F   3C: JAL X0, 0             INFINITE LOOP
+    ABCDE537 : 00: LUI X10, 0XABCDE      X10 = 0XABCDE000
+    00A00093 : 04: ADDI X1, X0, 10       X1 = 10
+    00300113 : 08: ADDI X2, X0, 3        X2 = 3
+    002081B3 : 0C: ADD X3, X1, X2        X3 = 13
+    40208233 : 10: SUB X4, X1, X2        X4 = 7
+    022082B3 : 14: MUL X5, X1, X2        X5 = 30
+    0220D333 : 18: DIV X6, X1, X2        X6 = 3
+    0220F3B3 : 1C: REM X7, X1, X2        X7 = 1
+    0023D433 : 20: SRL X8, X7, X2        X8 = 0
+    00552023 : 24: SW  X5, 0(X10)        STORE 30 AT ADDR 0XABCDE000
+    00052483 : 28: LW  X9, 0(X10)        LOAD 30 INTO X9
+    00928663 : 2C: BEQ X5, X9, 12        IF 30==30, JUMP TO PC 38
+    00100513 : 30: ADDI X10, X0, 1       TRAP: SKIPPED
+    00100513 : 34: ADDI X10, X0, 1       TRAP: SKIPPED
+    01E00613 : 38: ADDI X12, X0, 30      SUCCESS: X12 = 30
+    0000100F : 3C: FENCE                 NOP
+    05400793 : 40: ADDI X15, X0, 84      X15 = 84 (TARGET PC 0X54)
+    00078067 : 44: JALR X1, X15, 0       JUMP TO PC 84, LINK X1 = 72 (0X48)
+    00100513 : 48: ADDI X10, X0, 1       JALR TRAP: SKIPPED
+    00100513 : 4C: ADDI X10, X0, 1       JALR TRAP: SKIPPED
+    00100513 : 50: ADDI X10, X0, 1       JALR TRAP: SKIPPED
+    00D00693 : 54: ADDI X13, X0, 13      JALR SUCCESS: X13 = 13
+    0000100F : 58: FENCE                 NOP
+    07000293 : 5C: ADDI X5, X0, 112      X5 = 112 (HANDLER ADDR 0X70)
+    30529073 : 60: CSRRW X0, MTVEC, X5   SET MTVEC = 112
+    00100073 : 64: EBREAK                TRAP: JUMP TO PC 112
+    0000006F : 68: JAL X0, 0             HALT (INFINITE LOOP)
+    00000000 : 6C: PADDING               NOP
+    00100213 : 70: ADDI X4, X4, 1        INCREMENT TRAP COUNTER (X4)
+    00054583 : 74: LBU X11, 0(X10)       LOAD UNSIGNED BYTE (30)
+    30200073 : 78: MRET                  RETURN TO PC 104 (PC 68)
+    0000100F : 7C: FENCE                 HALT
     
 ```
 
 1. **RV32I Execution** : Performing basic operations such as ADD to verify datapath.
-1. **Register I/O:** Testing `LUI` and `ADDI` to ensure the RegFile latches values correctly.
-2. **M-Extension Check:** Calculating MUL, DIV, REN and  to verify the ALU's math units.
-3. **Memory Consistency:** Performing a Store Word (`SW`) followed by a Load Word (`LW`) to verify the memory system.
-4. **Branch Accuracy:** Using `BEQ` to jump over "Trap" instructions, ensuring the PC correctly updates to `jump_pc` when conditions are met.
-5. **Instruction Program HEXFile:** Writing a machine-level program according to the supported ISA and verifying through the trace.
+2. **Register I/O:** Testing `LUI`, `LBU`, `ADDI` to ensure the RegFile latches values correctly.
+3. **M-Extension Check:** Calculating MUL, DIV, REN and  to verify the ALU's math units.
+4. **Memory Consistency:** Performing a Store Word (`SW`) followed by a Load Word (`LW`) to verify the memory system.
+5. **Branch Accuracy:** Using `BEQ` to jump over "Trap" instructions, ensuring the PC correctly updates to `jump_pc` when conditions are met.
+6. **Control Status Registers:** Using `CSRRW`, `EBREAK`, `MRET` to verify CSRs.
+7. **Instruction Program HEXFile:** Writing a machine-level program according to the supported ISA and verifying through the trace.
 ---
 
 ## 🛠️ To-Do List
 
-* [🟨] **Complete Full ISA Extension:** Implement the remaining instructions for the **I** base set and the full **M**, **A**, and **F/D** extensions for comprehensive hardware support.
-* [🟨] **Implement CSRs:** Add Control and Status Registers (`mstatus`, `mepc`, etc.) to manage processor state and privilege levels.
-* [🟨] **Interrupt Handling Support :** Develop the hardware logic for handling interrupts.
+* [🟨] **Complete Full ISA Extension:** Implement the remaining instructions for **A** and **F/D** extensions for comprehensive hardware support.
+* [✅] **Implement CSRs:** Add Control and Status Registers (`mstatus`, `mepc`, etc.) to manage processor state and privilege levels.
 * [🟨] **Python CocoTB Testbenches :** Testbenching using CocoTB library for Python.
 * [🟨] **Vivado Synthesis & Simulation :** Simulate and make the RTL synthesizable for Vivado.
 

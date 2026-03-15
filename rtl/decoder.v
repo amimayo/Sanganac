@@ -20,8 +20,8 @@ module DECODER (
 
     always @(*) begin
         
-        if ((opcode == 7'b0010011) || (opcode == 7'b0000011)) begin 
-            imm_ext = {{20{instr[31]}}, instr[31:20]} ; end //I-Type Instruction
+        if ((opcode == 7'b0010011) || (opcode == 7'b0000011) || (opcode == 7'b1100111) || (opcode == 7'b1110011)) begin 
+            imm_ext = {{20{instr[31]}}, instr[31:20]} ; end //I-Type Instruction / CSR
         else if ((opcode == 7'b0110111) || (opcode == 7'b0010111)) begin 
              imm_ext = {instr[31:12], 12'b0} ; end //U-Type Instruction
         else if ((opcode == 7'b1100011)) begin 

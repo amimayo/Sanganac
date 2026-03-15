@@ -13,7 +13,11 @@ module RISCV_CORE (
     wire [2:0] funct3;
     wire [7:0] aluop;
     wire [3:0] mem_mask;
-    wire wr_en_rf, wr_en_mem, read_en_mem, is_jump;
+    wire wr_en_rf, wr_en_mem, read_en_mem, is_jump, load_unsigned;
+    wire [1:0] csr_op;
+    wire [11:0] csr_addr;
+    wire [31:0] csr_wr_data, csr_read_data, trap_pc, mret_pc, trap_cause;
+    wire csr_wr_en , csr_read_en, trap_take, mret_take, mie_out;
 
     PC pc (
         .clk(clk),
@@ -45,9 +49,10 @@ module RISCV_CORE (
         .mem_data_wr(mem_data_wr),
         .wr_en_mem(wr_en_mem),
         .read_en_mem(read_en_mem),
+        .load_unsigned(load_unsigned),
         .mem_mask(mem_mask),
         .mem_read_data(mem_read_data)
-);  
+    );  
 
     DECODER decoder (
         .instr(instr),
@@ -66,6 +71,24 @@ module RISCV_CORE (
         .rs2(alu_in2),
         .rd(alu_output)
     );
+ 
+    CSR csr (
+        .clk(clk),
+        .reset(reset),
+        .pc(pc_current),
+        .csr_op(csr_op),
+        .csr_addr(csr_addr),
+        .csr_wr_data(csr_wr_data),
+        .csr_wr_en(csr_wr_en),
+        .csr_read_en(csr_read_en),
+        .trap_take(trap_take),
+        .mret_take(mret_take),
+        .trap_cause(trap_cause),
+        .csr_read_data(csr_read_data),
+        .trap_pc(trap_pc),
+        .mret_pc(mret_pc),
+        .mie_out(mie_out)
+    );
 
     CONTROL_UNIT control_unit (
         .clk(clk),
@@ -73,6 +96,7 @@ module RISCV_CORE (
 
         .pc(pc_current),
         .mem_read(mem_read_data),
+        .csr_imm(instr[19:15]),
         .rs1_in(rs1),
         .rs2_in(rs2),
         .rd_output(alu_output),
@@ -80,6 +104,11 @@ module RISCV_CORE (
         .funct3(funct3),
         .funct7(funct7),
         .imm_ext(imm_ext),
+        .trap_pc(trap_pc),
+        .mret_pc(mret_pc),
+        .csr_read_data(csr_read_data),
+        .mie_out(mie_out),
+        .ext_int(1'b0),
 
         .alu_in1(alu_in1),
         .alu_in2(alu_in2),
@@ -88,11 +117,22 @@ module RISCV_CORE (
         .wr_en_rf(wr_en_rf),
         .wr_en_mem(wr_en_mem),
         .read_en_mem(read_en_mem),
+        .load_unsigned(load_unsigned),
         .mem_data_wr(mem_data_wr),
         .mem_addr(mem_addr),
         .mem_mask(mem_mask),
         .jump_pc(jump_pc),
-        .is_jump(is_jump)
+        .is_jump(is_jump),
+
+        .csr_op(csr_op),
+        .csr_addr(csr_addr),
+        .csr_wr_data(csr_wr_data),
+        .csr_wr_en(csr_wr_en),
+        .csr_read_en(csr_read_en),
+        .trap_take(trap_take),
+        .mret_take(mret_take),
+        .trap_cause(trap_cause)
+
     );
     
 endmodule
