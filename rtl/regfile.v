@@ -10,53 +10,53 @@ module REGFILE (
 );
 
 
-    reg [31:0] regfile [31:0];
+    reg [31:0] registerfile [31:0];
 
     initial begin
         
-        regfile[0] <= 0;
-        regfile[1] <= 0;
-        regfile[2] <= 0;
-        regfile[3] <= 0;
-        regfile[4] <= 0;
-        regfile[5] <= 0;
-        regfile[6] <= 0;
-        regfile[7] <= 0;
-        regfile[8] <= 0;
-        regfile[9] <= 0;
-        regfile[10] <= 0;
-        regfile[11] <= 0;
-        regfile[12] <= 0;
-        regfile[13] <= 0;
-        regfile[14] <= 0;
-        regfile[15] <= 0;
-        regfile[16] <= 0;
-        regfile[17] <= 0;
-        regfile[18] <= 0;
-        regfile[19] <= 0;
-        regfile[20] <= 0;
-        regfile[21] <= 0;
-        regfile[22] <= 0;
-        regfile[23] <= 0;
-        regfile[24] <= 0;
-        regfile[25] <= 0;
-        regfile[26] <= 0;
-        regfile[27] <= 0;
-        regfile[28] <= 0;
-        regfile[29] <= 0;
-        regfile[30] <= 0;
-        regfile[31] <= 0;
+        registerfile[0] <= 0;
+        registerfile[1] <= 0;
+        registerfile[2] <= 0;
+        registerfile[3] <= 0;
+        registerfile[4] <= 0;
+        registerfile[5] <= 0;
+        registerfile[6] <= 0;
+        registerfile[7] <= 0;
+        registerfile[8] <= 0;
+        registerfile[9] <= 0;
+        registerfile[10] <= 0;
+        registerfile[11] <= 0;
+        registerfile[12] <= 0;
+        registerfile[13] <= 0;
+        registerfile[14] <= 0;
+        registerfile[15] <= 0;
+        registerfile[16] <= 0;
+        registerfile[17] <= 0;
+        registerfile[18] <= 0;
+        registerfile[19] <= 0;
+        registerfile[20] <= 0;
+        registerfile[21] <= 0;
+        registerfile[22] <= 0;
+        registerfile[23] <= 0;
+        registerfile[24] <= 0;
+        registerfile[25] <= 0;
+        registerfile[26] <= 0;
+        registerfile[27] <= 0;
+        registerfile[28] <= 0;
+        registerfile[29] <= 0;
+        registerfile[30] <= 0;
+        registerfile[31] <= 0;
 
     end
 
-    assign rs1 = regfile[rs1_addr];
-    assign rs2 = regfile[rs2_addr];   
+    assign rs1 = registerfile[rs1_addr];
+    assign rs2 = registerfile[rs2_addr];   
 
     always @(posedge clk) begin
-        regfile[0] <= 0;
+        registerfile[0] <= 0;
 
         if (wr_en && rd_addr != 5'd0) begin
-            regfile[rd_addr] <= rd;
+            registerfile[rd_addr] <= rd;
         end
     end
 

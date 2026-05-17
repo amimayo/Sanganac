@@ -35,7 +35,15 @@
 │   ├── sanganac.vvp        # Compiled Icarus Verilog binary executable
 │   └── tb.vcd              # Value Change Dump for waveform analysis
 ├── tb/                     
-│   └── tb.v                # Comprehensive System Testbench
+│   └── tb.v                # Verilog System Testbench
+├── tests/                  # Python Verification Suite (CocoTB)
+│   ├── test_alu.py         # ALU Edge-Case And Random-Case Test
+│   ├── test_control.py     # Control unit Branch and Jump Logic testing
+│   ├── test_core.py        # Full System Test
+│   ├── test_csr.py         # CSR Operations Test
+│   ├── test_mem.py         # Memory Masking And Instructions Test
+│   └── test_runner.py      # Pytest Execution Script
+├── requirements.txt        # Project Dependencies
 ├── LICENSE                 # License (MIT)
 └── README.md               # Project documentation
 
@@ -155,12 +163,14 @@ Ensure you have the following open-source tools installed:
 
 * **Icarus Verilog:** For compilation and simulation.
 * **GTKWave:** For waveform analysis.
+* **CocoTB:** For Python Verification
 
 ### II. Cloning the Repository
 
 ```bash
 git clone https://github.com/amimayo/Sanganac.git
 cd Sanganac
+pip install -r requirements.txt
 
 ```
 
@@ -169,7 +179,7 @@ cd Sanganac
 Use `iverilog` to compile the testbench and all RTL modules:
 
 ```bash
-iverilog -o sanganac.vvp ./tb/tb.v ./rtl/*.v
+iverilog -o ./sim/sanganac.vvp ./tb/tb.v ./rtl/*.v
 
 ```
 
@@ -178,7 +188,7 @@ iverilog -o sanganac.vvp ./tb/tb.v ./rtl/*.v
 Execute the compiled binary to generate the Value Change Dump (`.vcd`) file:
 
 ```bash
-vvp sanganac.vvp
+vvp ./sim/sanganac.vvp
 
 ```
 
@@ -187,7 +197,16 @@ vvp sanganac.vvp
 Open the resulting waveform in GTKWave to inspect signal transitions:
 
 ```bash
-gtkwave tb.vcd
+gtkwave ./sim/tb.vcd
+
+```
+
+### VI. Python Verification
+
+Open the resulting waveform in GTKWave to inspect signal transitions:
+
+```bash
+pytest ./tests/test_runner.py -v
 
 ```
 
@@ -242,7 +261,7 @@ The verification testbench `tb.v` executes a sequence of instructions designed t
     00100073 : 64: EBREAK                TRAP: JUMP TO PC 112
     0000006F : 68: JAL X0, 0             HALT (INFINITE LOOP)
     00000000 : 6C: PADDING               NOP
-    00100213 : 70: ADDI X4, X4, 1        INCREMENT TRAP COUNTER (X4)
+    00180813 : 70: ADDI X16, X16, 1      INCREMENT TRAP COUNTER (X16)
     00054583 : 74: LBU X11, 0(X10)       LOAD UNSIGNED BYTE (30)
     30200073 : 78: MRET                  RETURN TO PC 104 (PC 68)
     0000100F : 7C: FENCE                 HALT
@@ -256,13 +275,22 @@ The verification testbench `tb.v` executes a sequence of instructions designed t
 5. **Branch Accuracy:** Using `BEQ` to jump over "Trap" instructions, ensuring the PC correctly updates to `jump_pc` when conditions are met.
 6. **Control Status Registers:** Using `CSRRW`, `EBREAK`, `MRET` to verify CSRs.
 7. **Instruction Program HEXFile:** Writing a machine-level program according to the supported ISA and verifying through the trace.
+
+The `tests` folder hosts an extensive Python Verification suite using CocoTB :
+
+1. `test_alu` : ALU Test Using Edge-Cases And Random-Cases
+2. `test_csr` : CSR Test Using Read/Write/Set/Clear Instructions
+3. `test_mem` : Memory Masking Test Using SB/SH And LUI/AUIPC Instructions
+4. `test_control` : Control Unit Test Using Branch (BEQ/BLT/BLTU) And Jump (JALR) Instructions
+5. `test_core` : Full Core Test using the HEX Program
+
 ---
 
 ## 🛠️ To-Do List
 
 * [🟨] **Complete Full ISA Extension:** Implement the remaining instructions for **A** and **F/D** extensions for comprehensive hardware support.
 * [✅] **Implement CSRs:** Add Control and Status Registers (`mstatus`, `mepc`, etc.) to manage processor state and privilege levels.
-* [🟨] **Python CocoTB Testbenches :** Testbenching using CocoTB library for Python.
+* [✅] **Python CocoTB Testbenches :** Testbenching using CocoTB library for Python.
 * [🟨] **Vivado Synthesis & Simulation :** Simulate and make the RTL synthesizable for Vivado.
 
 ---

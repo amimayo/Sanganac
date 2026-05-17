@@ -55,7 +55,7 @@ module tb ();
         // 00100073 : 64: EBREAK                TRAP: JUMP TO PC 112
         // 0000006F : 68: JAL X0, 0             HALT (INFINITE LOOP)
         // 00000000 : 6C: PADDING               NOP
-        // 00100213 : 70: ADDI X4, X4, 1        INCREMENT TRAP COUNTER (X4)
+        // 00180813 : 70: ADDI X16, X16, 1      INCREMENT TRAP COUNTER (X16)
         // 00054583 : 74: LBU X11, 0(X10)       LOAD UNSIGNED BYTE (30)
         // 30200073 : 78: MRET                  RETURN TO PC 104 (PC 68)
         // 0000100F : 7C: FENCE                 HALT
@@ -65,7 +65,7 @@ module tb ();
         $display("======================================================");
         $display("REGISTER FILE :"); 
         for (i = 0; i < 32; i = i + 1) begin
-            $display("x%0d : %h", i, uut.sanganac.regfile.regfile[i]);
+            $display("x%0d : %h", i, uut.sanganac.regfile.registerfile[i]);
         end
         $display("======================================================");
 

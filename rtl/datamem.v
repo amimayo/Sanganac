@@ -17,7 +17,7 @@ module DATAMEM (
         for (i = 0; i < 2048; i = i + 1) begin
             datamem[i] = 32'h0;
         end 
-        $readmemh("./sim/data_mem.hex", datamem);
+        $readmemh("../sim/data_mem.hex", datamem);
     end
 
     always @(*) begin
