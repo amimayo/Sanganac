@@ -5,7 +5,6 @@ module ALU (
     output reg [63:0] rd
 );
 
-
     wire signed [31:0] s_rs1 = rs1;
     wire signed [31:0] s_rs2 = rs2;
     wire signed [31:0] s_div = s_rs1 / s_rs2;

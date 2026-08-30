@@ -4,20 +4,55 @@ module DATAMEM (
     input [31:0] mem_data_wr,
     input wr_en_mem,
     input read_en_mem,
-    input load_unsigned,
-    input [3:0] mem_mask,
+    input [2:0] funct3,
     output reg [31:0] mem_read_data
 );
 
     reg [31:0] datamem [0:2047];
     wire [10:0] word_addr = addr[12:2];
+    wire [1:0] byte_sel = addr[1:0];
+    wire load_unsigned;
+    reg [3:0] mem_mask;
+    
+    assign load_unsigned = funct3[2];
+
     integer i;
 
     initial begin
         for (i = 0; i < 2048; i = i + 1) begin
             datamem[i] = 32'h0;
         end 
-        $readmemh("../sim/data_mem.hex", datamem);
+        $readmemh("./sim/data_mem.hex", datamem);
+    end
+
+    always @(*) begin
+
+        mem_mask = 4'b0000;
+
+        if (wr_en_mem || read_en_mem) begin
+            
+            case (funct3[1:0])
+
+                2'b00 : begin // LB, LBU, SB
+                    case (byte_sel)
+                        2'b00 : mem_mask = 4'b0001;
+                        2'b01 : mem_mask = 4'b0010;
+                        2'b10 : mem_mask = 4'b0100;
+                        2'b11 : mem_mask = 4'b1000;
+                    endcase
+                end
+
+                2'b01 : mem_mask =  (byte_sel[1]) ? 4'b1100 : 4'b0011; // LH, LHU, SH
+
+                2'b10 : mem_mask = 4'b1111;  // LW, SW
+
+                default : mem_mask = 4'b0000;
+
+            endcase
+
+
+        end
+        
     end
 
     always @(*) begin

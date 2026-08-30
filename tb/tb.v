@@ -17,7 +17,7 @@ module tb ();
     end
 
     initial begin
-        $dumpfile("tb.vcd");
+        $dumpfile("./sim/tb.vcd");
         $dumpvars(0, tb);
     end
 
@@ -100,7 +100,7 @@ module tb ();
 
     initial begin
         $monitor("Time : %0t | Reset : %b | PC : %h | Instruction : %h", 
-                 $time, reset, uut.sanganac.pc_current, uut.sanganac.instr);
+                 $time, reset, uut.sanganac.if_pc, uut.sanganac.if_instr);
     end
 
 endmodule

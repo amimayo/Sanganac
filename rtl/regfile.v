@@ -49,8 +49,11 @@ module REGFILE (
 
     end
 
-    assign rs1 = registerfile[rs1_addr];
-    assign rs2 = registerfile[rs2_addr];   
+    // assign rs1 = registerfile[rs1_addr];
+    // assign rs2 = registerfile[rs2_addr];   
+
+    assign rs1 = (wr_en && rd_addr != 5'b0 && rd_addr == rs1_addr) ? rd : registerfile[rs1_addr];
+    assign rs2 = (wr_en && rd_addr != 5'b0 && rd_addr == rs2_addr) ? rd : registerfile[rs2_addr];
 
     always @(posedge clk) begin
         registerfile[0] <= 0;

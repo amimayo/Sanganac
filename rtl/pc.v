@@ -2,6 +2,7 @@ module PC (
     input clk,
     input reset,
     input [31:0] jump_pc,
+    input stall,
     input is_jump,
     output [31:0] pc_next
 );
@@ -13,11 +14,14 @@ module PC (
         if (reset) begin
             pc <= 32'b0;
         end
-        else if (is_jump) begin
+        else if (!stall)  begin
+            
+            if (is_jump) begin
             pc <= jump_pc;
-        end
-        else begin
+            end
+            else begin
             pc <= pc + 32'd4;
+            end
         end
     
     end
