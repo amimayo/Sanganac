@@ -4,38 +4,34 @@ from cocotb.triggers import Timer
 @cocotb.test()
 async def test_mem_op(dut):
     
-    # Test mem_mask generation and LUI/AUIPC bypassing
+    # Test mem_mask generation
     
-    # Test LUI (Opcode 0110111)
-    dut.opcode.value = 0b0110111
-    dut.imm_ext.value = 0xABCDE000
-    await Timer(1, units="ns")
-    assert int(dut.out.value) == 0xABCDE000, "LUI Failed"
-    assert dut.wr_en_mem.value == 0, "LUI should not write memory"
-    
-    # Test AUIPC (Opcode 0010111)
-    dut.opcode.value = 0b0010111
-    dut.pc.value = 0x00000010
-    dut.imm_ext.value = 0x00001000
-    await Timer(1, units="ns")
-    assert int(dut.out.value) == 0x00001010, "AUIPC Failed"
+    # Test LB
 
-    # Test Store Byte (SB) Masking
-    dut.opcode.value = 0b0100011 # S-Type
-    dut.funct3.value = 0b000     # SB
-    
-    # Writing to address ending in 01 (byte offset 1)
-    dut.rd_output.value = 0x00000001 
+    dut.funct3.value = 0b100
+    dut.wr_en_mem.value = 0
+    dut.read_en_mem.value = 1
+    dut.addr.value = 0x1
     await Timer(1, units="ns")
-    assert int(dut.mem_mask.value) == 0b0010, "SB Masking failed for offset 1"
-    
-    # Writing to address ending in 10 (byte offset 2)
-    dut.rd_output.value = 0x00000002 
-    await Timer(1, units="ns")
-    assert int(dut.mem_mask.value) == 0b0100, "SB Masking failed for offset 2"
+    assert dut.load_unsigned.value == 1, "load_unsigned Not 1 for funct3 0b100"
+    assert dut.mem_mask.value == 0b0010, "mem_mask NOT 4'b0010 for byte_sel 2'b01 wrong"
 
-    # Test Store Halfword (SH) Masking
-    dut.funct3.value = 0b001     # SH
-    dut.rd_output.value = 0x00000002 # Offset 2
+    # Test LH
+
+    dut.funct3.value = 0b001
+    dut.wr_en_mem.value = 0
+    dut.read_en_mem.value = 1
+    dut.addr.value = 0x2
     await Timer(1, units="ns")
-    assert int(dut.mem_mask.value) == 0b1100, "SH Masking failed for offset 2"
+    assert dut.load_unsigned.value == 0, "load_unsigned Not 0 for funct3 0b001"
+    assert dut.mem_mask.value == 0b1100, "mem_mask NOT 4'b1100 for byte_sel 2'b10 wrong"
+
+    # Test LW
+
+    dut.funct3.value = 0b110
+    dut.wr_en_mem.value = 0
+    dut.read_en_mem.value = 1
+    dut.addr.value = 0x3
+    await Timer(1, units="ns")
+    assert dut.load_unsigned.value == 1, "load_unsigned Not 1 for funct3 0b110"
+    assert dut.mem_mask.value == 0b1111, "mem_mask NOT 4'b1111 for byte_sel 2'b10 wrong"

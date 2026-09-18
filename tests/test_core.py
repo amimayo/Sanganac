@@ -24,10 +24,14 @@ async def test_full_core(dut):
         await RisingEdge(dut.clk)
         cycles += 1
         
-        current_pc = int(dut.sanganac.pc_current.value) 
+        current_pc = int(dut.sanganac.if_pc.value) 
             
-        if current_pc == 0x68: # HALT / Infinite Loop Address
-            dut._log.info(f"Program successfully HALTED at cycle {cycles}")
+        if current_pc == 0x78: # HALT / Infinite Loop Address
+
+            for _ in range(10) :
+                await(RisingEdge(dut.clk))
+
+            dut._log.info(f"Program successfully HALTED at cycle {cycles+10}")
             break
             
     assert cycles < max_cycles, f"Simulation Timeout! Reached {max_cycles} cycles."

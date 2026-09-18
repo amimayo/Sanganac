@@ -30,8 +30,8 @@ def test_csr_module():
 # Memory & Masking Unit Tests
 def test_memory_logic():
     run(
-        verilog_sources=[os.path.join(RTL_DIR, "control.v")], 
-        toplevel="CONTROL_UNIT", 
+        verilog_sources=[os.path.join(RTL_DIR, "datamem.v")], 
+        toplevel="DATAMEM", 
         module="test_mem",       
         simulator="icarus",
         timescale="1ns/1ps"
