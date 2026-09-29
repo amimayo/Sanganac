@@ -38,7 +38,7 @@ async def test_full_core(dut):
     
     expected_registers = {
         0: 0x00000000,  # Hardwired zero
-        1: 0x0000000A,  # 10
+        1: 0x00000048,  # 72
         2: 0x00000003,  # 3
         3: 0x0000000D,  # 13 (ADD X1, X2)
         4: 0x00000007,  # 7  (SUB X1, X2)

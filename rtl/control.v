@@ -181,7 +181,7 @@ module CONTROL_UNIT (
             end
 
             7'b1110011 : begin
-                wr_en_rf = 1;
+                wr_en_rf = 0;
                 wr_en_mem = 0;
                 read_en_mem = 0;
 
