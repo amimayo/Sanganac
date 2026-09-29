@@ -10,7 +10,17 @@ module INSTRMEM (
         for (i = 0; i < 512; i = i + 1) begin
             instrmem[i] = 32'h0;
         end 
-        $readmemh("./sim/instr_program.hex", instrmem);
+
+        `ifdef COCOTB_SIM
+
+            $readmemh("../instr_program.hex", instrmem);
+
+        `else
+
+            $readmemh("./instr_program.hex", instrmem);
+
+        `endif
+
     end
 
     assign instr = instrmem[instr_addr >> 2]; //Instruction Memory Read

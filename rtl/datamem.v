@@ -22,7 +22,17 @@ module DATAMEM (
         for (i = 0; i < 2048; i = i + 1) begin
             datamem[i] = 32'h0;
         end 
-        $readmemh("./sim/data_mem.hex", datamem);
+
+        `ifdef COCOTB_SIM
+
+            $readmemh("../data_mem.hex", datamem);
+
+        `else 
+
+            $readmemh("./data_mem.hex", datamem);
+
+        `endif
+
     end
 
     always @(*) begin
